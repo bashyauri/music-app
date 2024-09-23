@@ -6,7 +6,9 @@ import {
   alpha_spaces as alphaSpaces,
   email,
   min_value as minValue,
-  max_value as maxValue
+  max_value as maxValue,
+  confirmed,
+  not_one_of as excluded
 } from '@vee-validate/rules'
 export default {
   install(app) {
@@ -20,5 +22,7 @@ export default {
     defineRule('email', email)
     defineRule('min_value', minValue)
     defineRule('max_value', maxValue)
+    defineRule('confirmed', confirmed)
+    defineRule('excluded', excluded)
   }
 }
