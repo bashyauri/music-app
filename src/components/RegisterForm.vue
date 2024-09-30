@@ -2,8 +2,9 @@
 
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/includes/firebase';
+import { auth, usersCollection } from '@/includes/firebase';
 import { ref } from 'vue';
+import { addDoc } from 'firebase/firestore';
 
 
 
@@ -21,29 +22,52 @@ const schema = ref({
     country: "required|country_excluded:Antarctica",
     tos: "tos"
 });
+
+const userCredentails = ref(null);
 const register = async (values) => {
     reg_in_submission.value = true; // Disable submit button
 
     try {
-        const response = await createUserWithEmailAndPassword(auth, values.email, values.password);
-        console.log(response);
+        userCredentails.value = await createUserWithEmailAndPassword(auth, values.email, values.password);
 
 
-        reg_alert_variant.value = 'bg-green-500';
-        reg_alert_message.value = 'Success! Your account is created.';
-        reg_show_alert.value = true; // Show alert after successful registration
+
     } catch (error) {
         console.error('Error creating user:', error);
         reg_alert_variant.value = 'bg-red-500';
-        reg_alert_message.value = 'Error creating user: ' + error.message;
-        reg_show_alert.value = true; // Show alert after error creating user
+        reg_alert_message.value = 'Error creating user: Please try again later';
+        reg_show_alert.value = true;
+        return;
     } finally {
         reg_in_submission.value = false; // Enable submit button after submission finishes
     }
+    try {
+
+        const userDetails = {
+            name: values.name,
+            email: values.email,
+            age: values.age,
+            country: values.country,
+
+        }
+        await addDoc(usersCollection, userDetails)
+        reg_alert_variant.value = 'bg-green-500';
+        reg_alert_message.value = 'Success! Your account is created.';
+        reg_show_alert.value = true; // Show alert after successful registration
+
+    } catch (error) {
+        console.error('Error creating user:', error);
+        reg_alert_variant.value = 'bg-red-500';
+        reg_alert_message.value = 'Error creating user: Please try again later';
+        reg_show_alert.value = true;
+
+    }
+
 };
 const userData = ref({
     country: 'USA',
 });
+
 </script>
 <template>
     <!-- Registration Form -->
