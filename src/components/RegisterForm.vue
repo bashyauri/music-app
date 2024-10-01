@@ -1,13 +1,14 @@
 <script setup>
 
 
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, usersCollection } from '@/includes/firebase';
+
+import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
-import { addDoc } from 'firebase/firestore';
 
 
 
+
+const store = useUserStore()
 const props = defineProps(['tab']);
 const reg_in_submission = ref(false);
 const reg_show_alert = ref(false);
@@ -23,12 +24,16 @@ const schema = ref({
     tos: "tos"
 });
 
-const userCredentails = ref(null);
+
 const register = async (values) => {
     reg_in_submission.value = true; // Disable submit button
 
     try {
-        userCredentails.value = await createUserWithEmailAndPassword(auth, values.email, values.password);
+        store.register(values);
+        reg_show_alert.value = true;
+        reg_alert_variant.value = 'bg-green-600';
+        reg_alert_message.value = 'User Created Successfully';
+
 
 
 
@@ -41,27 +46,7 @@ const register = async (values) => {
     } finally {
         reg_in_submission.value = false; // Enable submit button after submission finishes
     }
-    try {
 
-        const userDetails = {
-            name: values.name,
-            email: values.email,
-            age: values.age,
-            country: values.country,
-
-        }
-        await addDoc(usersCollection, userDetails)
-        reg_alert_variant.value = 'bg-green-500';
-        reg_alert_message.value = 'Success! Your account is created.';
-        reg_show_alert.value = true; // Show alert after successful registration
-
-    } catch (error) {
-        console.error('Error creating user:', error);
-        reg_alert_variant.value = 'bg-red-500';
-        reg_alert_message.value = 'Error creating user: Please try again later';
-        reg_show_alert.value = true;
-
-    }
 
 };
 const userData = ref({
