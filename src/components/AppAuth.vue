@@ -2,12 +2,15 @@
 
 import RegisterForm from '@/components/RegisterForm.vue';
 import { useModalStore } from '@/stores/modal';
+import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 import LoginForm from './LoginForm.vue';
 
 
 
 const store = useModalStore();
+const userStore = useUserStore();
+userStore.checkUserState();
 const tab = ref("login");
 
 

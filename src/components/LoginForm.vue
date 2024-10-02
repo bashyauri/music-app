@@ -2,8 +2,11 @@
 
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { useModalStore } from '@/stores/modal';
 
 const userStore = useUserStore();
+const useModal = useModalStore();
+userStore.checkUserState();
 
 const props = defineProps(['tab']);
 const log_in_submission = ref(false);
@@ -20,9 +23,7 @@ const loginSchema = ref({
 
 });
 
-const authenticate = () => {
 
-}
 
 const login = async (values) => {
     log_show_alert.value = true;
@@ -39,9 +40,11 @@ const login = async (values) => {
 
     }
 
-
     log_alert_variant.value = 'bg-green-500';
     log_alert_message.value = 'Success! Logged in'
+
+
+    useModal.isOpen = false;
 
 };
 </script>
