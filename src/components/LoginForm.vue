@@ -1,6 +1,9 @@
 <script setup>
 
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/user';
+
+const userStore = useUserStore();
 
 const props = defineProps(['tab']);
 const log_in_submission = ref(false);
@@ -17,15 +20,29 @@ const loginSchema = ref({
 
 });
 
-const login = (values) => {
+const authenticate = () => {
+
+}
+
+const login = async (values) => {
     log_show_alert.value = true;
     log_in_submission.value = true;
     log_alert_variant.value = 'bg-blue-500';
     log_alert_message.value = 'Login in..'
+    try {
+        await userStore.authenticate(values);
+    } catch (error) {
+        log_in_submission.value = false;
+        log_alert_variant.value = 'bg-red-500';
+        log_alert_message.value = 'Failed! Incorrect email or password'
+        return;
+
+    }
+
 
     log_alert_variant.value = 'bg-green-500';
     log_alert_message.value = 'Success! Logged in'
-    console.log(values);
+
 };
 </script>
 <template>
