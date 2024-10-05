@@ -16,15 +16,10 @@ onMounted(() => {
     if (user) {
       // User is logged in, update the store with user info
 
-      userStore.setUser({
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-      });
       userStore.userLoggedIn = true;
     } else {
       // User is not logged in, clear user info
-      userStore.setUser(null);
+
       userStore.userLoggedIn = false;
     }
   });

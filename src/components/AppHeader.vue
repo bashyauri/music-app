@@ -1,20 +1,31 @@
 <script setup>
 
+import { useRouter, useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal';
 import { useUserStore } from '@/stores/user';
 
 const store = useModalStore();
 
 const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
 
 
 
 const toggleAuthModal = () => {
     store.isOpen = !store.isOpen
-    console.log(store.isOpen);
 
 };
 
+const signOut = () => {
+    userStore.signOut();
+    if (route.name === "manage") {
+        store.isOpen = false;
+        router.push({ name: "home" })
+
+    }
+
+}
 
 
 </script>
@@ -41,8 +52,7 @@ const toggleAuthModal = () => {
                             <RouterLink class="px-2 text-white" :to="{ name: 'manage' }">Manage</RouterLink>
                         </li>
                         <li>
-                            <a class="px-2 text-white hover:cursor-pointer"
-                                @click.prevent="userStore.signOut">Logout</a>
+                            <a class="px-2 text-white hover:cursor-pointer" @click.prevent="signOut">Logout</a>
                         </li>
                     </template>
 
