@@ -4,6 +4,7 @@ import ManageView from '@/views/ManageView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  linkExactActiveClass: 'text-yellow-500',
   routes: [
     {
       path: '/',
@@ -19,11 +20,29 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     },
     {
-      path: '/manage',
+      path: '/manage-music',
       name: 'manage',
-      component: ManageView
+      alias: '/manage',
+      component: ManageView,
+      beforeEnter: (to, from, next) => {
+        console.log('Manage Guard working')
+        next()
+      }
+    },
+    {
+      path: '/manage',
+      redirect: { name: 'manage' }
+    },
+    {
+      path: '/:catchAll(.*)*',
+      redirect: { name: 'home' }
     }
   ]
+})
+router.beforeEach((to, from, next) => {
+  console.log('Coming from Global Guard')
+
+  next()
 })
 
 export default router

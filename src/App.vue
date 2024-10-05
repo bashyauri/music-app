@@ -4,6 +4,7 @@ import AppAuth from '@/components/AppAuth.vue';
 import { useUserStore } from '@/stores/user';
 import { auth } from './includes/firebase';
 import { onMounted } from 'vue';
+import { onAuthStateChanged } from 'firebase/auth';
 
 
 
@@ -11,9 +12,10 @@ const userStore = useUserStore();
 
 onMounted(() => {
   // Check if user is authenticated
-  auth.onAuthStateChanged((user) => {
+  onAuthStateChanged(auth, (user) => {
     if (user) {
       // User is logged in, update the store with user info
+
       userStore.setUser({
         uid: user.uid,
         email: user.email,
