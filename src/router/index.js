@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import ManageView from '@/views/ManageView.vue'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,8 +26,10 @@ const router = createRouter({
       alias: '/manage',
       component: ManageView,
       beforeEnter: (to, from, next) => {
-        console.log('Manage Guard working')
         next()
+      },
+      meta: {
+        requiresAuth: true
       }
     },
     {
@@ -40,9 +43,15 @@ const router = createRouter({
   ]
 })
 router.beforeEach((to, from, next) => {
-  console.log('Coming from Global Guard')
-
-  next()
+  if (!to.meta.requiresAuth) {
+    next()
+    return
+  }
+  const userStore = useUserStore()
+  if (userStore.userLoggedIn) {
+    next()
+  }
+  next({ name: 'home' })
 })
 
 export default router

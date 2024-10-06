@@ -19,7 +19,7 @@ const toggleAuthModal = () => {
 
 const signOut = () => {
     userStore.signOut();
-    if (route.name === "manage") {
+    if (route.meta.requiresAuth) {
         store.isOpen = false;
         router.push({ name: "home" })
 
