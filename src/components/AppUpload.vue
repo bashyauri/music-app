@@ -1,9 +1,12 @@
 <script setup>
-import { storage, storageRef, uploadBytes } from '@/includes/firebase';
+import { storage, storageRef, uploadBytesResumable } from '@/includes/firebase';
+
 
 import { ref } from 'vue';
 
 const is_dragover = ref(false);
+const progress = ref(null);
+const uploads = ref([]);
 
 const upload = ($event) => {
     is_dragover.value = false;
@@ -15,25 +18,74 @@ const upload = ($event) => {
         }
         // music-app-8d394.appspot.com
         // Reference to the file path in Firebase Storage
+        const metadata = {
+            contentType: 'image/jpeg'
+        };
         const fileRef = storageRef(storage, `songs/${file.name}`);
+        const uploadTask = uploadBytesResumable(fileRef, file, metadata);
+        const uploadIndex = uploads.value.push({
+            uploadTask,
+            name: file.name,
+            current_progress: 0
+        }) - 1;
 
         // Upload the file
-        uploadBytes(fileRef, file)
-            .then((snapshot) => {
-                console.log(`${file.name} uploaded successfully!`);
-            })
-            .catch((error) => {
-                console.error(`Failed to upload ${file.name}:`, error);
-            });
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                progress.value = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                uploads.value[uploadIndex].current_progress = progress.value;
+                console.log('Upload is ' + progress.value + '% done');
+                switch (snapshot.state) {
+                    case 'paused':
+                        console.log('Upload is paused');
+                        break;
+                    case 'running':
+                        console.log('Upload is running');
+                        break;
+                }
+            },
+            (error) => {
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        console.log('Upload cancelled');
+                        break;
 
-        // console.log(storage)
+                    case 'storage/retry-limit-exceeded':
+                        console.log("Retry limit exceeded");
+                        break;
+                    case 'storage/max-size-exceeded':
+                        console.log("Max size exceeded");
+                        // File size is larger than the maximum allowed size
+                        break;
 
-        // const fileRef = storageRef(storageRef, `songs/${file.name}`);
-        // const songsRef = storageref.child(`songs/${file.name}`)
-        // songsRef.put(file)
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
+                    default:
+                        console.error('An unknown error occurred:', error);
+                        break;
+                }
+            },
+            () => {
+                // Handle successful uploads on complete
+                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                // getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                //     console.log('File available at', downloadURL);
+                // });
+            }
+        );
+
     })
-    console.log(files)
-}
+
+};
 </script>
 <template>
     <div class="relative flex flex-col bg-white border border-gray-200 rounded">
@@ -52,26 +104,17 @@ const upload = ($event) => {
             </div>
             <hr class="my-6" />
             <!-- Progess Bars -->
-            <div class="mb-4">
+            <div class="mb-4" v-for="upload in uploads" :key="upload.name">
                 <!-- File Name -->
-                <div class="text-sm font-bold">Just another song.mp3</div>
+                <div class="text-sm font-bold">{{ upload.name }}</div>
                 <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
                     <!-- Inner Progress Bar -->
-                    <div class="transition-all bg-blue-400 progress-bar" style="width: 75%"></div>
+                    <div class="transition-all bg-blue-400 progress-bar" :class="'bg-blue-400'"
+                        :style="{ width: upload.current_progress + '%' }">
+                    </div>
                 </div>
             </div>
-            <div class="mb-4">
-                <div class="text-sm font-bold">Just another song.mp3</div>
-                <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-                    <div class="transition-all bg-blue-400 progress-bar" style="width: 35%"></div>
-                </div>
-            </div>
-            <div class="mb-4">
-                <div class="text-sm font-bold">Just another song.mp3</div>
-                <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
-                    <div class="transition-all bg-blue-400 progress-bar" style="width: 55%"></div>
-                </div>
-            </div>
+
         </div>
     </div>
 </template>
