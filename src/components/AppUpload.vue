@@ -1,10 +1,38 @@
 <script setup>
+import { storage, storageRef, uploadBytes } from '@/includes/firebase';
+
 import { ref } from 'vue';
 
 const is_dragover = ref(false);
 
-const upload = () => {
+const upload = ($event) => {
     is_dragover.value = false;
+    const files = [...$event.dataTransfer.files];
+    files.forEach((file) => {
+        if (file.type !== "audio/mpeg") {
+            return console.error(`${file.name} is not a valid audio file.`);
+
+        }
+        // music-app-8d394.appspot.com
+        // Reference to the file path in Firebase Storage
+        const fileRef = storageRef(storage, `songs/${file.name}`);
+
+        // Upload the file
+        uploadBytes(fileRef, file)
+            .then((snapshot) => {
+                console.log(`${file.name} uploaded successfully!`);
+            })
+            .catch((error) => {
+                console.error(`Failed to upload ${file.name}:`, error);
+            });
+
+        // console.log(storage)
+
+        // const fileRef = storageRef(storageRef, `songs/${file.name}`);
+        // const songsRef = storageref.child(`songs/${file.name}`)
+        // songsRef.put(file)
+    })
+    console.log(files)
 }
 </script>
 <template>
@@ -19,7 +47,7 @@ const upload = () => {
                 :class="{ 'bg-green-400 border-green-400 border-solid': is_dragover }" @drag.prevent.stop=""
                 @dragstart.prevent.stop="" @dragend.prevent.stop="is_dragover = false"
                 @dragover.prevent.stop="is_dragover = true" @dragenter.prevent.stop="is_dragover = true"
-                @dragleave.prevent.stop="is_dragover = false" @drop.prevent.stop="upload">
+                @dragleave.prevent.stop="is_dragover = false" @drop.prevent.stop="upload($event)">
                 <h5>Drop your files here</h5>
             </div>
             <hr class="my-6" />
