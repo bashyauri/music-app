@@ -19,14 +19,17 @@ const upload = ($event) => {
         // music-app-8d394.appspot.com
         // Reference to the file path in Firebase Storage
         const metadata = {
-            contentType: 'image/jpeg'
+            contentType: 'audio/mpeg'
         };
         const fileRef = storageRef(storage, `songs/${file.name}`);
         const uploadTask = uploadBytesResumable(fileRef, file, metadata);
         const uploadIndex = uploads.value.push({
             uploadTask,
             name: file.name,
-            current_progress: 0
+            current_progress: 0,
+            variant: 'bg-blue-400',
+            icon: 'fas fa-spinner fa-spin',
+            text_class: '',
         }) - 1;
 
         // Upload the file
@@ -47,10 +50,14 @@ const upload = ($event) => {
                 }
             },
             (error) => {
-                // A full list of error codes is available at
-                // https://firebase.google.com/docs/storage/web/handle-errors
+                uploads.value[uploadIndex].variant = 'bg-red-400';
+                uploads.value[uploadIndex].icon = 'fas fa-times';
+                uploads.value[uploadIndex].text_class = 'text-red-400';
+                console.error('An error occurred:', error.code);
                 switch (error.code) {
+
                     case 'storage/unauthorized':
+                        console.error('An error occurred:')
                         // User doesn't have permission to access the object
                         break;
                     case 'storage/canceled':
@@ -75,11 +82,10 @@ const upload = ($event) => {
                 }
             },
             () => {
-                // Handle successful uploads on complete
-                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                // getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                //     console.log('File available at', downloadURL);
-                // });
+                uploads.value[uploadIndex].variant = 'bg-green-400';
+                uploads.value[uploadIndex].icon = 'fas fa-check';
+                uploads.value[uploadIndex].text_class = 'text-green-400';
+
             }
         );
 
@@ -106,10 +112,11 @@ const upload = ($event) => {
             <!-- Progess Bars -->
             <div class="mb-4" v-for="upload in uploads" :key="upload.name">
                 <!-- File Name -->
-                <div class="text-sm font-bold">{{ upload.name }}</div>
+                <div class="text-sm font-bold" :class="upload.text_class"><i :class="upload.icon"></i> {{ upload.name }}
+                </div>
                 <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
                     <!-- Inner Progress Bar -->
-                    <div class="transition-all bg-blue-400 progress-bar" :class="'bg-blue-400'"
+                    <div class="transition-all progress-bar" :class="upload.variant"
                         :style="{ width: upload.current_progress + '%' }">
                     </div>
                 </div>
