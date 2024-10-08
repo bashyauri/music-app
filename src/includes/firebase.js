@@ -3,7 +3,13 @@ import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getAuth } from 'firebase/auth'
 import { getFirestore, collection } from 'firebase/firestore'
-import { getStorage, ref as storageRef, uploadBytes, uploadBytesResumable } from 'firebase/storage' // Alias the ref as storageRef for clarity
+import {
+  getStorage,
+  getDownloadURL,
+  ref as storageRef,
+  uploadBytes,
+  uploadBytesResumable
+} from 'firebase/storage' // Alias the ref as storageRef for clarity
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDyHTA_BWlJNX4eZ9yc08RA9sJTt9Qqp88',
@@ -31,6 +37,7 @@ const storage = getStorage(app)
 
 // Define collections
 const usersCollection = collection(db, 'users')
+const songsCollection = collection(db, 'songs')
 
 // Export firebase services and helpers
 export {
@@ -39,8 +46,10 @@ export {
   analytics,
   db,
   usersCollection,
+  songsCollection,
   storage,
   storageRef,
   uploadBytes,
-  uploadBytesResumable
+  uploadBytesResumable,
+  getDownloadURL
 }

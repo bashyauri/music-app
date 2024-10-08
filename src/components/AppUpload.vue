@@ -1,5 +1,6 @@
 <script setup>
-import { storage, storageRef, uploadBytesResumable } from '@/includes/firebase';
+import { auth, storage, getDownloadURL, storageRef, uploadBytesResumable, songsCollection } from '@/includes/firebase';
+import { addDoc } from 'firebase/firestore';
 
 
 import { ref } from 'vue';
@@ -81,7 +82,32 @@ const upload = ($event) => {
                         break;
                 }
             },
-            () => {
+            async () => {
+                const song = {
+                    uid: auth.currentUser.uid,
+                    display_name: auth.currentUser.displayName,
+                    original_name: uploadTask.snapshot.ref.name,
+                    modified_name: uploadTask.snapshot.ref.name,
+                    genre: "",
+                    comment_count: 0,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    url: "",
+                }
+                try {
+
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    song.url = downloadURL;
+                    await addDoc(songsCollection, song)
+
+                    console.log('File available at', downloadURL);
+
+                } catch (error) {
+                    console.error('Error fetching the download URL', error);
+                }
+
+
+
                 uploads.value[uploadIndex].variant = 'bg-green-400';
                 uploads.value[uploadIndex].icon = 'fas fa-check';
                 uploads.value[uploadIndex].text_class = 'text-green-400';
