@@ -3,7 +3,7 @@ import { auth, storage, getDownloadURL, storageRef, uploadBytesResumable, songsC
 import { addDoc } from 'firebase/firestore';
 
 
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 
 const is_dragover = ref(false);
 const progress = ref(null);
@@ -119,6 +119,12 @@ const upload = ($event) => {
     })
 
 };
+onBeforeUnmount(() => {
+    uploads.value.forEach((upload) => {
+        upload.uploadTask.cancel();
+
+    })
+});
 </script>
 <template>
     <div class="relative flex flex-col bg-white border border-gray-200 rounded">
