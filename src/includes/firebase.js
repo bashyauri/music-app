@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getAuth } from 'firebase/auth'
-import { getFirestore, collection } from 'firebase/firestore'
+import { getFirestore, collection, query } from 'firebase/firestore'
 import {
   getStorage,
   getDownloadURL,
@@ -51,5 +51,6 @@ export {
   storageRef,
   uploadBytes,
   uploadBytesResumable,
-  getDownloadURL
+  getDownloadURL,
+  query
 }

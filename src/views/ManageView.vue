@@ -1,6 +1,20 @@
 <script setup>
 import AppUpload from '@/components/AppUpload.vue';
+import { songsCollection, auth, query } from '@/includes/firebase';
+import { getDocs, where } from 'firebase/firestore';
+import { onBeforeMount } from 'vue';
 
+
+onBeforeMount(async () => {
+    const q = query(songsCollection, where("uid", "==", auth.currentUser.uid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+    });
+
+
+});
 
 
 
