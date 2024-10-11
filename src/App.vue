@@ -1,29 +1,6 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
 import AppAuth from '@/components/AppAuth.vue';
-import { useUserStore } from '@/stores/user';
-import { auth } from './includes/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-
-
-
-const userStore = useUserStore();
-
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is logged in, update the store with user info
-
-    userStore.userLoggedIn = true;
-  } else {
-    // User is not logged in, clear user info
-
-    userStore.userLoggedIn = false;
-  }
-});
-
-
-
 </script>
 <template>
   <AppHeader />

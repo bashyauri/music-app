@@ -15,43 +15,33 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      component: () => import('../views/AboutView.vue') // Lazy-loaded
     },
     {
       path: '/manage-music',
       name: 'manage',
       alias: '/manage',
       component: ManageView,
-      beforeEnter: (to, from, next) => {
-        next()
-      },
-      meta: {
-        requiresAuth: true
-      }
+      meta: { requiresAuth: true }
     },
     {
-      path: '/manage',
-      redirect: { name: 'manage' }
-    },
-    {
-      path: '/:catchAll(.*)*',
-      redirect: { name: 'home' }
+      path: '/:catchAll(.*)',
+      redirect: { name: 'home' } // Redirect unmatched routes to home
     }
   ]
 })
+
+// Global navigation guard
 router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+
   if (!to.meta.requiresAuth) {
     next()
-    return
-  }
-  const userStore = useUserStore()
-  if (userStore.userLoggedIn) {
+  } else if (userStore.userLoggedIn) {
     next()
+  } else {
+    next({ name: 'home' }) // Redirect to home if not logged in
   }
-  next({ name: 'home' })
 })
 
 export default router
