@@ -10,6 +10,7 @@ const state = reactive({
     songs: []
 });
 
+
 const fetchSongData = async () => {
     try {
         const q = query(songsCollection, where("uid", "==", auth.currentUser.uid));
@@ -30,6 +31,8 @@ const fetchSongData = async () => {
     }
 };
 
+
+
 // Fetch songs when the component is mounted
 onBeforeMount(() => {
     fetchSongData();
@@ -42,7 +45,7 @@ onBeforeMount(() => {
     <section class="container mx-auto mt-6">
         <div class="md:grid md:grid-cols-3 md:gap-4">
             <div class="col-span-1">
-                <AppUpload />
+                <AppUpload :addSong="fetchSongData" />
             </div>
             <div class="col-span-2">
                 <div class="relative flex flex-col bg-white border border-gray-200 rounded">

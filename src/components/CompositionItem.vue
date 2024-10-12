@@ -1,7 +1,9 @@
 <script setup>
+
+import { songsCollection, storage, storageRef } from '@/includes/firebase';
+import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { deleteObject } from 'firebase/storage';
 import { ref } from 'vue';
-import { songsCollection } from '@/includes/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 
 const emit = defineEmits(['updated'])
 const in_submission = ref(false);
@@ -20,7 +22,48 @@ const props = defineProps({
     }
 });
 
+const deleteSong = async () => {
+    const deleteRef = storageRef(storage, `songs/${props.song.original_name}`);
 
+
+    try {
+        await deleteObject(deleteRef);
+
+        await deleteDoc(doc(songsCollection, props.song.docID))
+        emit('updated');
+        console.log('File deleted successfully');
+    } catch (error) {
+        alert_message.value = 'Something went wrong try again later';
+        in_submission.value = false;
+        console.error(error);
+
+        switch (error.code) {
+            case 'storage/unauthorized':
+                console.error('An error occurred:');
+                // User doesn't have permission to access the object
+                break;
+            case 'storage/canceled':
+                console.log('Upload cancelled');
+                break;
+
+            case 'storage/retry-limit-exceeded':
+                console.log("Retry limit exceeded");
+                break;
+            case 'storage/max-size-exceeded':
+                console.log("Max size exceeded");
+                // File size is larger than the maximum allowed size
+                break;
+
+            case 'storage/unknown':
+                // Unknown error occurred, inspect error.serverResponse
+                break;
+            default:
+                console.error('An unknown error occurred:', error);
+                break;
+        }
+        return
+    }
+};
 const edit = async (values) => {
     in_submission.value = true;
     show_alert.value = true;
@@ -78,20 +121,13 @@ const edit = async (values) => {
     }
 
 };
-const fetchSongData = async () => {
-    const songRef = doc(songsCollection, props.song.docId);
-    const songSnap = await getDoc(songRef);
 
-    if (songSnap.exists()) {
-        props.song = songSnap.data(); // Update the song data
-    }
-};
 </script>
 <template>
     <div class="p-3 mb-4 border border-gray-200 rounded">
         <div v-show="!showForm">
             <h4 class="inline-block text-2xl font-bold">{{ props.song.modified_name }}</h4>
-            <button class="float-right px-2 py-1 ml-1 text-sm text-white bg-red-600 rounded">
+            <button class="float-right px-2 py-1 ml-1 text-sm text-white bg-red-600 rounded" @click="deleteSong">
                 <i class="fa fa-times"></i>
             </button>
             <button class="float-right px-2 py-1 ml-1 text-sm text-white bg-blue-600 rounded"

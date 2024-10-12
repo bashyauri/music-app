@@ -3,11 +3,22 @@ import { auth, storage, getDownloadURL, storageRef, uploadBytesResumable, songsC
 import { addDoc } from 'firebase/firestore';
 
 
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
+
+const props = defineProps({
+    addSong: {
+        type: Function,
+        required: true
+    }
+})
+console.log(props.songs)
+
 
 const is_dragover = ref(false);
 const progress = ref(null);
-const uploads = ref([]);
+const state = reactive({
+    uploads: []
+});
 
 const upload = ($event) => {
     is_dragover.value = false;
@@ -25,7 +36,7 @@ const upload = ($event) => {
         };
         const fileRef = storageRef(storage, `songs/${file.name}`);
         const uploadTask = uploadBytesResumable(fileRef, file, metadata);
-        const uploadIndex = uploads.value.push({
+        const uploadIndex = state.uploads.push({
             uploadTask,
             name: file.name,
             current_progress: 0,
@@ -40,7 +51,7 @@ const upload = ($event) => {
                 // Observe state change events such as progress, pause, and resume
                 // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                 progress.value = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                uploads.value[uploadIndex].current_progress = progress.value;
+                state.uploads[uploadIndex].current_progress = progress.value;
                 console.log('Upload is ' + progress.value + '% done');
                 switch (snapshot.state) {
                     case 'paused':
@@ -52,9 +63,9 @@ const upload = ($event) => {
                 }
             },
             (error) => {
-                uploads.value[uploadIndex].variant = 'bg-red-400';
-                uploads.value[uploadIndex].icon = 'fas fa-times';
-                uploads.value[uploadIndex].text_class = 'text-red-400';
+                state.uploads[uploadIndex].variant = 'bg-red-400';
+                state.uploads[uploadIndex].icon = 'fas fa-times';
+                state.uploads[uploadIndex].text_class = 'text-red-400';
                 console.error('An error occurred:', error.code);
                 switch (error.code) {
 
@@ -99,19 +110,25 @@ const upload = ($event) => {
 
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                     song.url = downloadURL;
-                    await addDoc(songsCollection, song)
+                    const songRef = await addDoc(songsCollection, song)
+                    props.addSong(songRef);
 
-                    console.log('File available at', downloadURL);
+
+
+
+
 
                 } catch (error) {
                     console.error('Error fetching the download URL', error);
                 }
 
+                state.uploads[uploadIndex].variant = 'bg-green-400';
+                state.uploads[uploadIndex].icon = 'fas fa-check';
+                state.uploads[uploadIndex].text_class = 'text-green-400';
 
 
-                uploads.value[uploadIndex].variant = 'bg-green-400';
-                uploads.value[uploadIndex].icon = 'fas fa-check';
-                uploads.value[uploadIndex].text_class = 'text-green-400';
+
+
 
             }
         );
@@ -120,7 +137,7 @@ const upload = ($event) => {
 
 };
 onBeforeUnmount(() => {
-    uploads.value.forEach((upload) => {
+    state.uploads.forEach((upload) => {
         upload.uploadTask.cancel();
 
     })
@@ -144,7 +161,7 @@ onBeforeUnmount(() => {
             <input type="file" multiple @change="upload($event)" />
             <hr class="my-6" />
             <!-- Progess Bars -->
-            <div class="mb-4" v-for="upload in uploads" :key="upload.name">
+            <div class="mb-4" v-for="upload in state.uploads" :key="upload.name">
                 <!-- File Name -->
                 <div class="text-sm font-bold" :class="upload.text_class"><i :class="upload.icon"></i> {{ upload.name }}
                 </div>
