@@ -3,12 +3,14 @@ import AppUpload from '@/components/AppUpload.vue';
 import CompositionItem from '@/components/CompositionItem.vue';
 import { songsCollection, auth } from '@/includes/firebase';
 import { getDocs, query, where } from 'firebase/firestore';
-import { onBeforeMount, reactive } from 'vue';
+import { onBeforeMount, reactive, ref } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 
 const state = reactive({
     songs: []
 });
+const unsavedFlag = ref(false);
 
 
 const fetchSongData = async () => {
@@ -30,12 +32,24 @@ const fetchSongData = async () => {
         console.error('Error fetching songs:', error);
     }
 };
+const updateUnsavedFlag = (value) => {
+    unsavedFlag.value = value;
+}
 
 
 
 // Fetch songs when the component is mounted
 onBeforeMount(() => {
     fetchSongData();
+});
+onBeforeRouteLeave((to, from, next) => {
+    if (unsavedFlag.value) {
+
+        confirm('Your changes have not been saved. Do you want to leave this page?');
+    }
+    next();
+
+
 });
 
 </script>
@@ -56,7 +70,7 @@ onBeforeMount(() => {
                     <div class="p-6">
                         <!-- Composition Items -->
                         <CompositionItem v-for="song in state.songs" :key="song.docID" :song="song"
-                            @updated="fetchSongData" />
+                            @updated="fetchSongData" :updateUnsavedFlag="updateUnsavedFlag" />
                     </div>
                 </div>
             </div>
