@@ -1,21 +1,95 @@
 <script setup>
-import { onMounted, reactive } from 'vue';
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { songsCollection } from '@/includes/firebase';
-import { getDocs } from 'firebase/firestore';
+import { getDocs, limit, orderBy, query, startAfter } from 'firebase/firestore';
 import SongItem from '@/components/SongItem.vue';
 
 
 
+const pendingRequest = ref(false);
+const maxPerPage = ref(3);
 const state = reactive({
   songs: [],
 });
 
 onMounted(async () => {
-  const snapshots = await getDocs(songsCollection);
+  await getSongs();
+  window.addEventListener('scroll', handleScroll)
+
+
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+
+});
+
+
+const handleScroll = () => {
+  const { scrollTop, offsetHeight } = document.documentElement;
+  const { innerHeight, } = window;
+  const bottomOfWindow = Math.round(scrollTop) + innerHeight === offsetHeight;
+  if (bottomOfWindow) {
+    getSongs();
+    console.log('Bottom reached');
+  }
+
+}
+const getSongs = async () => {
+  if (pendingRequest.value) {
+    return;
+  }
+  pendingRequest.value = true;
+  let lastVisible = null;
+
+  // Check if there are songs in state
+  if (state.songs.length > 0) {
+    const lastSong = state.songs[state.songs.length - 1];
+    lastVisible = lastSong.modified_name; // Assuming 'createdAt' is your ordering field
+  }
+
+  // Create the query based on whether or not there is a lastVisible document
+  let q;
+  if (lastVisible) {
+    q = query(
+      songsCollection,
+      orderBy("modified_name"), // Order by your field (e.g., 'createdAt')
+      startAfter(lastVisible), // Start after the last visible document
+      limit(maxPerPage.value)
+    );
+  } else {
+    q = query(
+      songsCollection,
+      orderBy("modified_name"),
+      limit(maxPerPage.value)
+    );
+  }
+
+  // Fetch the documents with the defined query
+  const snapshots = await getDocs(q);
+
+  // Stop further fetching if no documents are returned
+  if (snapshots.empty) {
+    console.log('No more songs to fetch');
+    return;
+  }
+
+  // Loop through the documents and push them to state
   snapshots.forEach(doc => {
     state.songs.push({ docID: doc.id, ...doc.data() });
   });
-});
+  pendingRequest.value = false;
+
+  // If the number of documents fetched is less than the limit, stop further fetching
+  if (snapshots.size < maxPerPage.value) {
+    return console.log('Reached the last song');
+    // No more songs to fetch, stop further pagination
+  }
+};
+
+
+
+
+
 
 </script>
 
