@@ -25,6 +25,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      name: 'song',
+      path: '/song/:id',
+
+      component: () => import('@/views/SongView.vue') // Lazy-loaded
+    },
+    {
       path: '/:catchAll(.*)',
       redirect: { name: 'home' } // Redirect unmatched routes to home
     }
