@@ -1,6 +1,6 @@
 <script setup>
 import { songsCollection, commentsCollection, auth } from '@/includes/firebase';
-import { addDoc, doc, getDoc } from 'firebase/firestore';
+import { addDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { useUserStore } from '@/stores/user';
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted, reactive, ref } from 'vue';
@@ -11,6 +11,7 @@ const route = useRoute();
 const router = useRouter();
 const state = reactive({
     song: {},
+    comments: []
 
 });
 const schema = ref({
@@ -21,6 +22,25 @@ const comment_in_submission = ref(false);
 const comment_show_alert = ref(false);
 const comment_alert_variant = ref('bg-blue-500');
 const comment_alert_message = ref('Please wait! Your comment is been submitted');
+
+const getComments = async () => {
+    try {
+        const q = query(commentsCollection, where("sid", "==", route.params.id));
+        const querySnapshot = await getDocs(q);
+        state.comments = [];
+
+        querySnapshot.forEach((doc) => {
+            const comment = {
+                ...doc.data(),
+                docID: doc.id,
+            };
+            state.comments.push(comment);
+        });
+    } catch (error) {
+        console.error('Error fetching songs:', error);
+    }
+
+};
 
 const addComment = async (values, { resetForm }) => {
 
@@ -49,6 +69,7 @@ onMounted(async () => {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         state.song = docSnap.data();
+        getComments();
     } else {
         return router.push({ name: 'home' });
 
@@ -107,78 +128,18 @@ onMounted(async () => {
     </section>
     <!-- Comments -->
     <ul class="container mx-auto">
-        <li class="p-6 border border-gray-200 bg-gray-50">
+        <li class="p-6 border border-gray-200 bg-gray-50" v-for="comment in state.comments" :key="comment.docID">
             <!-- Comment Author -->
             <div class="mb-5">
-                <div class="font-bold">Elaine Dreyfuss</div>
-                <time>5 mins ago</time>
+                <div class="font-bold">{{ comment.name }}</div>
+                <time>{{ comment.datePosted }}</time>
             </div>
 
             <p>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium der doloremque laudantium.
+                {{ comment.content }}
             </p>
         </li>
-        <li class="p-6 border border-gray-200 bg-gray-50">
-            <!-- Comment Author -->
-            <div class="mb-5">
-                <div class="font-bold">Elaine Dreyfuss</div>
-                <time>5 mins ago</time>
-            </div>
 
-            <p>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium der doloremque laudantium.
-            </p>
-        </li>
-        <li class="p-6 border border-gray-200 bg-gray-50">
-            <!-- Comment Author -->
-            <div class="mb-5">
-                <div class="font-bold">Elaine Dreyfuss</div>
-                <time>5 mins ago</time>
-            </div>
-
-            <p>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium der doloremque laudantium.
-            </p>
-        </li>
-        <li class="p-6 border border-gray-200 bg-gray-50">
-            <!-- Comment Author -->
-            <div class="mb-5">
-                <div class="font-bold">Elaine Dreyfuss</div>
-                <time>5 mins ago</time>
-            </div>
-
-            <p>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium der doloremque laudantium.
-            </p>
-        </li>
-        <li class="p-6 border border-gray-200 bg-gray-50">
-            <!-- Comment Author -->
-            <div class="mb-5">
-                <div class="font-bold">Elaine Dreyfuss</div>
-                <time>5 mins ago</time>
-            </div>
-
-            <p>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium der doloremque laudantium.
-            </p>
-        </li>
-        <li class="p-6 border border-gray-200 bg-gray-50">
-            <!-- Comment Author -->
-            <div class="mb-5">
-                <div class="font-bold">Elaine Dreyfuss</div>
-                <time>5 mins ago</time>
-            </div>
-
-            <p>
-                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                accusantium der doloremque laudantium.
-            </p>
-        </li>
     </ul>
 
 </template>
