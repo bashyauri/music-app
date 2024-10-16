@@ -38,6 +38,7 @@ const storage = getStorage(app)
 // Define collections
 const usersCollection = collection(db, 'users')
 const songsCollection = collection(db, 'songs')
+const commentsCollection = collection(db, 'comments')
 
 // Export firebase services and helpers
 export {
@@ -47,6 +48,7 @@ export {
   db,
   usersCollection,
   songsCollection,
+  commentsCollection,
   storage,
   storageRef,
   uploadBytes,

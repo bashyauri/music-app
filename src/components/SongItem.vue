@@ -1,4 +1,9 @@
 <script setup>
+import { RouterLink } from 'vue-router';
+
+
+
+
 const props = defineProps({
     song: {
         type: Object,
@@ -9,7 +14,10 @@ const props = defineProps({
 <template>
     <li class="flex items-center justify-between p-3 pl-6 transition duration-300 cursor-pointer hover:bg-gray-50">
         <div>
-            <a href="#" class="block font-bold text-gray-600">{{ props.song.modified_name }}</a>
+            <RouterLink :to="{ name: 'song', params: { id: song.docID } }" class="block font-bold text-gray-600">{{
+                props.song.modified_name
+            }}
+            </RouterLink>
             <span class="text-sm text-gray-500">{{ props.song.display_name }}</span>
         </div>
 
