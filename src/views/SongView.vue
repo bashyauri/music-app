@@ -3,7 +3,7 @@ import { songsCollection, commentsCollection, auth } from '@/includes/firebase';
 import { addDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { useUserStore } from '@/stores/user';
 import { useRoute, useRouter } from 'vue-router';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ErrorMessage } from 'vee-validate';
 
 const store = useUserStore();
@@ -11,17 +11,49 @@ const route = useRoute();
 const router = useRouter();
 const state = reactive({
     song: {},
-    comments: []
-
+    comments: [],
 });
+
+const sort = ref("1");
 const schema = ref({
-    comment: "required|min:3|max:100|alpha_spaces",
-
+    comment: "required|min:3|max:100",
 });
+
 const comment_in_submission = ref(false);
 const comment_show_alert = ref(false);
 const comment_alert_variant = ref('bg-blue-500');
-const comment_alert_message = ref('Please wait! Your comment is been submitted');
+const comment_alert_message = ref('Please wait! Your comment is being submitted');
+
+onMounted(async () => {
+    const docRef = doc(songsCollection, route.params.id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        // Check if the query has a `sort` parameter and set it.
+        sort.value = route.query.sort === "1" || route.query.sort === "2" ? route.query.sort : "1";
+        state.song = docSnap.data();
+        getComments();
+    } else {
+        return router.push({ name: 'home' });
+    }
+});
+
+// Watch for changes in `sort` and update the URL query parameter accordingly.
+watch(sort, (newValue) => {
+    if (newValue !== route.query.sort) {
+        router.push({
+            query: { ...route.query, sort: newValue },
+        });
+    }
+});
+
+const sortedComments = computed(() => {
+    return state.comments.slice().sort((a, b) => {
+        if (sort.value === '1') {
+            return new Date(b.datePosted) - new Date(a.datePosted);
+        }
+        return new Date(a.datePosted) - new Date(b.datePosted);
+    });
+});
 
 const getComments = async () => {
     try {
@@ -37,17 +69,15 @@ const getComments = async () => {
             state.comments.push(comment);
         });
     } catch (error) {
-        console.error('Error fetching songs:', error);
+        console.error('Error fetching comments:', error);
     }
-
 };
 
 const addComment = async (values, { resetForm }) => {
-
     comment_in_submission.value = true;
     comment_show_alert.value = true;
     comment_alert_variant.value = 'bg-blue-500';
-    comment_alert_message.value = 'Please wait! Your comment is been submitted';
+    comment_alert_message.value = 'Please wait! Your comment is being submitted';
 
     const comment = {
         content: values.comment,
@@ -55,29 +85,16 @@ const addComment = async (values, { resetForm }) => {
         sid: route.params.id,
         name: auth.currentUser.displayName,
         uid: auth.currentUser.uid,
-    }
+    };
     await addDoc(commentsCollection, comment);
+    getComments();
     comment_in_submission.value = false;
     comment_alert_variant.value = 'bg-green-500';
     comment_alert_message.value = 'Your comment has been submitted successfully!';
     resetForm();
-
-}
-
-onMounted(async () => {
-    const docRef = doc(songsCollection, route.params.id)
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-        state.song = docSnap.data();
-        getComments();
-    } else {
-        return router.push({ name: 'home' });
-
-    }
-
-});
-
+};
 </script>
+
 <template>
     <!-- Music Header -->
     <section class="relative w-full mb-8 text-center text-white py-14">
@@ -118,7 +135,7 @@ onMounted(async () => {
                     </button>
                 </VeeForm>
                 <!-- Sort Comments -->
-                <select
+                <select v-model="sort"
                     class="block mt-4 py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded">
                     <option value="1">Latest</option>
                     <option value="2">Oldest</option>
@@ -128,7 +145,7 @@ onMounted(async () => {
     </section>
     <!-- Comments -->
     <ul class="container mx-auto">
-        <li class="p-6 border border-gray-200 bg-gray-50" v-for="comment in state.comments" :key="comment.docID">
+        <li class="p-6 border border-gray-200 bg-gray-50" v-for="comment in sortedComments" :key="comment.docID">
             <!-- Comment Author -->
             <div class="mb-5">
                 <div class="font-bold">{{ comment.name }}</div>
