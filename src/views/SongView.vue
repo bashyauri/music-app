@@ -1,6 +1,6 @@
 <script setup>
 import { songsCollection, commentsCollection, auth } from '@/includes/firebase';
-import { addDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { useUserStore } from '@/stores/user';
 import { useRoute, useRouter } from 'vue-router';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
@@ -87,6 +87,13 @@ const addComment = async (values, { resetForm }) => {
         uid: auth.currentUser.uid,
     };
     await addDoc(commentsCollection, comment);
+    state.song.comment_count += 1;
+
+
+    const songRef = doc(songsCollection, route.params.id);
+    await updateDoc(songRef, {
+        comment_count: state.song.comment_count,
+    });
     getComments();
     comment_in_submission.value = false;
     comment_alert_variant.value = 'bg-green-500';
@@ -102,7 +109,8 @@ const addComment = async (values, { resetForm }) => {
             style="background-image: url(/assets/img/song-header.png)"></div>
         <div class="container flex items-center mx-auto">
             <!-- Play/Pause Button -->
-            <button type="button" class="z-50 w-24 h-24 text-3xl text-black bg-white rounded-full focus:outline-none">
+            <button type="button" class="z-50 w-24 h-24 text-3xl text-black bg-white rounded-full focus:outline-none"
+                @click.prevent="newSong(song)">
                 <i class="fas fa-play"></i>
             </button>
             <div class="z-50 ml-8 text-left">
@@ -117,7 +125,7 @@ const addComment = async (values, { resetForm }) => {
         <div class="relative flex flex-col bg-white border border-gray-200 rounded">
             <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
                 <!-- Comment Count -->
-                <span class="card-title">Comments (15)</span>
+                <span class="card-title">Comments ({{ state.song.comment_count }})</span>
                 <i class="float-right text-2xl text-green-400 fa fa-comments"></i>
             </div>
             <div class="p-6">
