@@ -2,11 +2,15 @@
 import { songsCollection, commentsCollection, auth } from '@/includes/firebase';
 import { addDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { useUserStore } from '@/stores/user';
+
+import { usePlayerStore } from '@/stores/player';
+
 import { useRoute, useRouter } from 'vue-router';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ErrorMessage } from 'vee-validate';
 
 const store = useUserStore();
+const playerStore = usePlayerStore();
 const route = useRoute();
 const router = useRouter();
 const state = reactive({
@@ -100,6 +104,7 @@ const addComment = async (values, { resetForm }) => {
     comment_alert_message.value = 'Your comment has been submitted successfully!';
     resetForm();
 };
+
 </script>
 
 <template>
@@ -110,7 +115,7 @@ const addComment = async (values, { resetForm }) => {
         <div class="container flex items-center mx-auto">
             <!-- Play/Pause Button -->
             <button type="button" class="z-50 w-24 h-24 text-3xl text-black bg-white rounded-full focus:outline-none"
-                @click.prevent="newSong(song)">
+                @click="playerStore.newSong(state.song)">
                 <i class="fas fa-play"></i>
             </button>
             <div class="z-50 ml-8 text-left">
