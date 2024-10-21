@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia'
 import { Howl } from 'howler'
+import helper from '@/includes/helper'
 
 export const usePlayerStore = defineStore('player', {
   state: () => ({
     current_song: {},
-    sound: {},
+    sound: null,
     seek: '00:00',
-    duration: '00:00'
+    duration: '00:00',
+    playerProgress: '0%'
   }),
   actions: {
     async newSong(song) {
+      if (this.sound) {
+        this.sound.stop()
+        this.sound.unload()
+      }
       this.current_song = song
       this.sound = new Howl({
         src: [song.url],
@@ -22,7 +28,7 @@ export const usePlayerStore = defineStore('player', {
       })
     },
     async toggleAudio() {
-      if (!this.sound.playing) {
+      if (!this.sound) {
         return
       }
       if (this.sound.playing()) {
@@ -32,14 +38,15 @@ export const usePlayerStore = defineStore('player', {
       }
     },
     progress() {
-      this.seek = this.sound.seek()
-      this.duration = this.sound.duration()
+      this.seek = helper.formatTime(this.sound.seek())
+      this.duration = helper.formatTime(this.sound.duration())
+      this.playerProgress = `${(this.sound.seek() / this.sound.duration()) * 100}%`
       if (this.sound.playing()) {
         requestAnimationFrame(this.progress)
       }
     }
   },
   getters: {
-    isPlaying: (state) => (state.sound.playing() ? state.sound.playing() : false)
+    isPlaying: (state) => (state.sound && state.sound.playing ? state.sound.playing() : false)
   }
 })
