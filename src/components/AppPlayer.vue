@@ -26,7 +26,7 @@ const playerStore = usePlayerStore();
             <!-- Current Position -->
             <div class="player-currenttime">{{ playerStore.seek }}</div>
             <!-- Scrub Container  -->
-            <div class="relative w-full h-2 bg-gray-200 rounded cursor-pointer">
+            <div @click="playerStore.updateSeek" class="relative w-full h-2 bg-gray-200 rounded cursor-pointer">
                 <!-- Player Ball -->
                 <span class="absolute -top-2.5 -ml-2.5 text-gray-800 text-lg"
                     :style="{ left: playerStore.playerProgress }">
