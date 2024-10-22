@@ -126,7 +126,7 @@ const addComment = async (values, { resetForm }) => {
         </div>
     </section>
     <!-- Form -->
-    <section class="container mx-auto mt-6">
+    <section class="container mx-auto mt-6" id="comments">
         <div class="relative flex flex-col bg-white border border-gray-200 rounded">
             <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
                 <!-- Comment Count -->
