@@ -4,7 +4,10 @@ import { songsCollection } from '@/includes/firebase';
 import { getDocs, limit, orderBy, query, startAfter } from 'firebase/firestore';
 import SongItem from '@/components/SongItem.vue';
 
+import iconSecondary from '@/directives/icon-secondary';
 
+
+const vIconSecondary = iconSecondary
 
 const pendingRequest = ref(false);
 const maxPerPage = ref(3);
@@ -117,10 +120,11 @@ const getSongs = async () => {
     <!-- Main Content -->
     <section class="container mx-auto">
       <div class="relative flex flex-col bg-white border border-gray-200 rounded">
-        <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
+        <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200"
+          v-icon-secondary="{ icon: 'headphones-alt', right: true }">
           <span class="card-title">Songs</span>
           <!-- Icon -->
-          <i class="float-right text-xl text-green-400 fa fa-headphones-alt"></i>
+
         </div>
         <!-- Playlist -->
         <ol id="playlist">
