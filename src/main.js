@@ -11,13 +11,14 @@ import VeeValidatePlugin from './includes/validation'
 import { auth } from './includes/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import icon from './directives/icon'
-
+import i18n from './includes/i18n'
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
 app.use(VeeValidatePlugin)
 app.directive('icon', icon)
+app.use(i18n)
 
 app.mount('#app')
 const userStore = useUserStore()
