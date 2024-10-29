@@ -124,6 +124,7 @@ const addComment = async (values, { resetForm }) => {
                     <!-- Song Info -->
                     <div class="text-3xl font-bold">{{ state.song.modified_name }}</div>
                     <div>{{ state.song.genre }}</div>
+                    <div class="song-price">{{ $n(1, "currency", "ja") }}</div>
                 </div>
             </div>
         </section>
@@ -134,7 +135,8 @@ const addComment = async (values, { resetForm }) => {
                     <!-- Comment Count -->
                     <span class="card-title">{{ $tc("song.comment_count", state.song.comment_count, {
                         count:
-                            state.song.comment_count }) }}</span>
+                            state.song.comment_count
+                    }) }}</span>
                     <i class="float-right text-2xl text-green-400 fa fa-comments"></i>
                 </div>
                 <div class="p-6">
