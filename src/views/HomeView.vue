@@ -104,7 +104,7 @@ const getSongs = async () => {
         style="background-image: url(assets/img/header.png)"></div>
       <div class="container mx-auto">
         <div class="text-white main-header-content">
-          <h1 class="mb-5 text-5xl font-bold">Listen to Great Music!</h1>
+          <h1 class="mb-5 text-5xl font-bold">{{ $t("home.listen") }}</h1>
           <p class="w-full mx-auto md:w-8/12">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
             et dolor mollis, congue augue non, venenatis elit. Nunc justo eros,
