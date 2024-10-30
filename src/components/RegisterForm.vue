@@ -126,7 +126,8 @@ const userData = ref({
         <!-- TOS -->
         <div class="pl-6 mb-3">
             <VeeField type="checkbox" name="tos" value="1" class="float-left w-4 h-4 mt-1 -ml-6 rounded" />
-            <label class="inline-block">Accept terms of service</label>
+            <i18n-t class="inline-block" keypath="register.accept" tag="label"><a href="#">{{ $t('register.tos')
+                    }}</a></i18n-t>
             <ErrorMessage class="block text-red-600" name="tos" />
         </div>
         <button type="submit"
