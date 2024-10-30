@@ -3,6 +3,10 @@
 import { useRouter, useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal';
 import { useUserStore } from '@/stores/user';
+import { useI18n } from 'vue-i18n'
+import { computed } from 'vue';
+
+const { locale } = useI18n()
 
 const store = useModalStore();
 
@@ -16,7 +20,11 @@ const toggleAuthModal = () => {
     store.isOpen = !store.isOpen
 
 };
+const currentLocale = computed(() => locale.value === 'fr' ? 'Français' : 'English')
 
+const changeLocale = () => {
+    locale.value = locale.value === 'fr' ? 'en' : 'fr'
+}
 const signOut = () => {
     userStore.signOut();
     if (route.meta.requiresAuth) {
@@ -25,7 +33,7 @@ const signOut = () => {
 
     }
 
-}
+};
 
 
 </script>
@@ -55,6 +63,14 @@ const signOut = () => {
                             <a class="px-2 text-white hover:cursor-pointer" @click.prevent="signOut">Logout</a>
                         </li>
                     </template>
+
+                </ul>
+                <ul class="ml-auto">
+                    <li>
+                        <a class="px-2 text-white" href="#" @click="changeLocale">
+                            {{ currentLocale }}
+                        </a>
+                    </li>
 
                 </ul>
             </div>
