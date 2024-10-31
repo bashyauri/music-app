@@ -2,6 +2,7 @@
 import { songsCollection, commentsCollection, auth } from '@/includes/firebase';
 import { addDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { useUserStore } from '@/stores/user';
+import { useI18n } from 'vue-i18n'
 
 import { usePlayerStore } from '@/stores/player';
 
@@ -10,6 +11,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ErrorMessage } from 'vee-validate';
 
 const store = useUserStore();
+const { t } = useI18n()
 const playerStore = usePlayerStore();
 const route = useRoute();
 const router = useRouter();
@@ -133,7 +135,7 @@ const addComment = async (values, { resetForm }) => {
             <div class="relative flex flex-col bg-white border border-gray-200 rounded">
                 <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
                     <!-- Comment Count -->
-                    <span class="card-title">{{ $tc("song.comment_count", state.song.comment_count, {
+                    <span class="card-title">{{ t("song.comment_count", state.song.comment_count, {
                         count:
                             state.song.comment_count
                     }) }}</span>
