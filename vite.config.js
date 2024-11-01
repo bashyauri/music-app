@@ -13,6 +13,19 @@ export default defineConfig({
       registerType: 'autoUpdate',
       devOptions: {
         enabled: true
+      },
+      manifest: {
+        name: 'Music App',
+        short_name: 'Music App',
+        description: 'A simple music player app',
+        theme_color: '#ff5e3a',
+        icons: [
+          {
+            src: 'assets/img/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          }
+        ]
       }
     }),
     vueDevTools()

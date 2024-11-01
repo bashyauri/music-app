@@ -12,6 +12,9 @@ import { auth } from './includes/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import icon from './directives/icon'
 import i18n from './includes/i18n'
+import { registerSW } from 'virtual:pwa-register'
+
+registerSW({ immediate: true })
 const app = createApp(App)
 
 app.use(createPinia())
