@@ -2,7 +2,14 @@
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getAuth } from 'firebase/auth'
-import { getFirestore, collection, query } from 'firebase/firestore'
+import {
+  getFirestore,
+  collection,
+  query,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager
+} from 'firebase/firestore'
 import {
   getStorage,
   getDownloadURL,
@@ -22,6 +29,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
+
+initializeFirestore(app, {
+  localCache: persistentLocalCache(/*settings*/ { tabManager: persistentSingleTabManager() })
+})
 
 // Initialize Analytics (optional)
 const analytics = getAnalytics(app)

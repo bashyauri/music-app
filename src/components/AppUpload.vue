@@ -11,7 +11,7 @@ const props = defineProps({
         required: true
     }
 })
-console.log(props.songs)
+
 
 
 const is_dragover = ref(false);
@@ -28,6 +28,17 @@ const upload = ($event) => {
         if (file.type !== "audio/mpeg") {
             return console.error(`${file.name} is not a valid audio file.`);
 
+        }
+        if (!navigator.onLine) {
+            state.uploads.push({
+                task: {},
+                current_progress: 100,
+                name: file.name,
+                variant: 'bg-red-400',
+                icon: 'fas fa-times',
+                text_class: 'text-red-400',
+            })
+            return;
         }
         // music-app-8d394.appspot.com
         // Reference to the file path in Firebase Storage
