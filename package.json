@@ -17,6 +17,7 @@
     "@vee-validate/rules": "^4.13.2",
     "firebase": "^10.13.2",
     "howler": "^2.2.4",
+    "lodash": "^4.17.21",
     "music-app": "file:",
     "pinia": "^2.1.7",
     "vee-validate": "^4.13.2",

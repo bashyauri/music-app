@@ -13,6 +13,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import icon from './directives/icon'
 import i18n from './includes/i18n'
 import { registerSW } from 'virtual:pwa-register'
+import { GlobalComponent } from './includes/_globals.js'
 
 registerSW({ immediate: true })
 const app = createApp(App)
@@ -22,6 +23,7 @@ app.use(router)
 app.use(VeeValidatePlugin)
 app.directive('icon', icon)
 app.use(i18n)
+app.use(GlobalComponent)
 
 app.mount('#app')
 const userStore = useUserStore()
