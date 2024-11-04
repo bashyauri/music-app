@@ -3,7 +3,6 @@ import HomeView from '@/views/HomeView.vue'
 import ManageView from '@/views/ManageView.vue'
 import { useUserStore } from '@/stores/user'
 import AboutView from '@/views/AboutView.vue'
-import { storeToRefs } from 'pinia'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

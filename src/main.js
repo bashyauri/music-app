@@ -14,8 +14,11 @@ import icon from './directives/icon'
 import i18n from './includes/i18n'
 import { registerSW } from 'virtual:pwa-register'
 import { GlobalComponent } from './includes/_globals.js'
+import progressBar from './includes/progress-bar'
+import 'nprogress/nprogress.css'
 
 registerSW({ immediate: true })
+progressBar(router)
 const app = createApp(App)
 app.use(router)
 app.use(createPinia())
