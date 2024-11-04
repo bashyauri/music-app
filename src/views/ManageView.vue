@@ -6,14 +6,14 @@ import { getDocs, query, where } from 'firebase/firestore';
 import { onBeforeMount, reactive, ref } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 
-
 const state = reactive({
     songs: []
 });
 const unsavedFlag = ref(false);
-
+const loading = ref(false); // Added loading state
 
 const fetchSongData = async () => {
+    loading.value = true; // Start loading
     try {
         const q = query(songsCollection, where("uid", "==", auth.currentUser.uid));
         const querySnapshot = await getDocs(q);
@@ -30,28 +30,32 @@ const fetchSongData = async () => {
         });
     } catch (error) {
         console.error('Error fetching songs:', error);
+    } finally {
+        loading.value = false; // Stop loading
     }
 };
+
 const updateUnsavedFlag = (value) => {
     unsavedFlag.value = value;
 }
-
-
 
 // Fetch songs when the component is mounted
 onBeforeMount(() => {
     fetchSongData();
 });
+
 onBeforeRouteLeave((to, from, next) => {
     if (unsavedFlag.value) {
-
-        confirm('Your changes have not been saved. Do you want to leave this page?');
+        const answer = confirm('Your changes have not been saved. Do you want to leave this page?');
+        if (answer) {
+            next(); // Proceed with navigation
+        } else {
+            next(false); // Prevent navigation
+        }
+    } else {
+        next(); // No unsaved changes, proceed
     }
-    next();
-
-
 });
-
 </script>
 
 <template>
@@ -68,6 +72,7 @@ onBeforeRouteLeave((to, from, next) => {
                         <i class="float-right text-2xl text-green-400 fa fa-compact-disc"></i>
                     </div>
                     <div class="p-6">
+                        <div v-if="loading">Loading songs...</div> <!-- Loading Indicator -->
                         <!-- Composition Items -->
                         <CompositionItem v-for="song in state.songs" :key="song.docID" :song="song"
                             @updated="fetchSongData" :updateUnsavedFlag="updateUnsavedFlag" />

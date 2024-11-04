@@ -17,9 +17,9 @@ import { GlobalComponent } from './includes/_globals.js'
 
 registerSW({ immediate: true })
 const app = createApp(App)
-
-app.use(createPinia())
 app.use(router)
+app.use(createPinia())
+
 app.use(VeeValidatePlugin)
 app.directive('icon', icon)
 app.use(i18n)

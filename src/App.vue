@@ -3,35 +3,29 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppAuth from '@/components/AppAuth.vue';
 import AppPlayer from './components/AppPlayer.vue';
 </script>
+
 <template>
   <AppHeader />
 
+  <transition name="fade" mode="out-in">
+    <router-view />
+  </transition>
 
-  <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
-      <component :is="Component" />
-
-    </transition>
-
-  </router-view>
   <AppPlayer />
-
   <AppAuth />
-
-
 </template>
+
 <style scoped>
-.fade-enter-from {
-  opacity: 0;
-
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
 }
 
-.fade-enter-active {
-  transition: all 0.5s linear;
-}
+.fade-enter,
+.fade-leave-to
 
-.fade-enter-to {
-  transition: all 0.5s ease;
+/* .fade-leave-active in <2.1.8 */
+  {
   opacity: 0;
 }
 </style>

@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import ManageView from '@/views/ManageView.vue'
 import { useUserStore } from '@/stores/user'
+import AboutView from '@/views/AboutView.vue'
+import { storeToRefs } from 'pinia'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,12 +17,12 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: () => import('../views/AboutView.vue') // Lazy-loaded
+      component: AboutView
     },
     {
-      path: '/manage-music',
+      path: '/manage',
       name: 'manage',
-      alias: '/manage',
+
       component: ManageView,
       meta: { requiresAuth: true }
     },
@@ -37,8 +39,8 @@ const router = createRouter({
   ]
 })
 
-// Global navigation guard
 router.beforeEach((to, from, next) => {
+  console.log(`Navigating from: ${from.name} to: ${to.name}`)
   const userStore = useUserStore()
 
   if (!to.meta.requiresAuth) {
@@ -46,7 +48,7 @@ router.beforeEach((to, from, next) => {
   } else if (userStore.userLoggedIn) {
     next()
   } else {
-    next({ name: 'home' }) // Redirect to home if not logged in
+    next({ name: 'home' })
   }
 })
 

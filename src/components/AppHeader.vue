@@ -60,7 +60,7 @@ const signOut = () => {
                             <RouterLink class="px-2 text-white" :to="{ name: 'manage' }">Manage</RouterLink>
                         </li>
                         <li>
-                            <a class="px-2 text-white hover:cursor-pointer" @click.prevent="signOut">Logout</a>
+                            <a class="px-2 text-white hover:cursor-pointer" @click="signOut">Logout</a>
                         </li>
                     </template>
 
