@@ -20,8 +20,8 @@ import 'nprogress/nprogress.css'
 registerSW({ immediate: true })
 progressBar(router)
 const app = createApp(App)
-app.use(router)
 app.use(createPinia())
+app.use(router)
 
 app.use(VeeValidatePlugin)
 app.directive('icon', icon)

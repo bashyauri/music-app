@@ -4,15 +4,15 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-// import { visualizer } from 'rollup-plugin-visualizer'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    // visualizer({
-    //   filename: 'bundle-visualizer.html',
-    //   open: true
-    // }),
+    visualizer({
+      filename: 'bundle-visualizer.html',
+      open: true
+    }),
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
